@@ -1,0 +1,316 @@
+openapi: 3.0.0
+info:
+  title: CompreBem Marketeplace API — Products
+  description: |-
+       # Products Integration API (CompreBem)
+        This API allows the creation/update/deletion/search of products by partners (shopkeeper).
+        It follows the REST standard, with JSON resources and OpenAPI 3.0 specification.
+  contact:
+    email: apiteam@comprebem.com.br
+  version: 1.0.0
+externalDocs:
+  description: More information about CompreBem Marketeplace API
+  url: https://comprebem.com.br/apis
+servers:
+  - url: https://api.comprebem.com.br/mkt-api/v1
+tags:
+  - name: Products
+    description: Everything related to Products
+    externalDocs:
+      description: Find out more
+      url: https://comprebem.com.br/apis
+paths:
+  /products:
+    get:
+      tags:
+        - Products
+      summary: Get products
+      description: Gets products list. Some parameters can be used for search. This resource also implements pagination
+      operationId: getProducts
+      parameters:
+        - in: query
+          name: productName
+          description: Product name.
+          schema:
+            type: string
+        - $ref: '#/components/parameters/fields'
+        - $ref: '#/components/parameters/limit'
+        - $ref: '#/components/parameters/offset'
+      responses:
+        '200':
+          description: Successful operation
+          headers:
+            contentRange:
+              description: Total amount of records
+              schema:
+                type: integer
+                format: int32
+            acceptRange:
+              description: Maximum amount of records that can be retrieved by request
+              schema:
+                type: integer
+                format: int32
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/product'
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/unauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/forbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/notFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/internalServerError'
+    post:
+      tags:
+        - Products (Creation)
+      summary: Creates a new product
+      description: Allows the product's creation
+      operationId: createProduct
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/product'
+      responses:
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/unauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/forbiddenError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/internalServerError'
+                
+  /products/{productId}:    
+    put:
+      tags:
+        - Products (Update)
+      summary: Updates a product
+      description: Allows the product's update
+      operationId: updateProduct
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          description: Product id
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              $ref: '#/components/schemas/product'
+      responses:
+        '201':
+          description: Created
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/unauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/forbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/notFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/internalServerError'
+    delete:
+      tags:
+        - Products (Deletion)
+      summary: Deletes a product
+      description: Allows the product's update
+      operationId: deleteProduct
+      parameters:
+        - in: path
+          name: productId
+          required: true
+          description: Product id
+          schema:
+            type: string
+      responses:
+        '204':
+          description: No Content
+        '401':
+          description: Unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/unauthorizedError'
+        '403':
+          description: Forbidden
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/forbiddenError'
+        '404':
+          description: Not Found
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/notFoundError'
+        '500':
+          description: Internal Server Error
+          content:
+            application/json:
+              schema:
+                type: object
+                $ref: '#/components/schemas/internalServerError'
+components:
+  parameters:
+    fields:
+      name: _fields
+      description: |
+        Inform which attributes should be returned in the response. Ex.: _fields=code,name,address.
+      in: query
+      required: false
+      schema:
+        type: string
+    limit:
+      name: _limit
+      description: Amount of records to be returned.
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+    offset:
+      name: _offset
+      description: Initial record to be returned.
+      in: query
+      required: false
+      schema:
+        type: integer
+        format: int32
+  schemas:
+    product:
+      type: object
+      required: [id, name, price, currency, category, status]
+      properties:
+        id:
+          type: string
+          example: 9DAFB45372A8
+        name:
+          type: string
+          example: iPhone 17
+        price:
+          type: number
+          format: float
+          example: 18000
+        currency:
+          type: string
+          example: BRL
+        category:
+          type: string
+          example: Smart Phone
+        status:
+          type: string
+          enum: [ATIVO, INATIVO]
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+    unauthorizedError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: 401
+        message:
+          type: string
+          example: Unauthorized
+    forbiddenError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: 403
+        message:
+          type: string
+          example: Forbidden
+    notFoundError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: 404
+        message:
+          type: string
+          example: Resource Not Found
+    internalServerError:
+      type: object
+      required: [code, message]
+      properties:
+        code:
+          type: string
+          example: 500
+        message:
+          type: string
+          example: Internal Server Error
