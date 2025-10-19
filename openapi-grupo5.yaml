@@ -267,7 +267,7 @@ components:
           example: Smart Phone
         status:
           type: string
-          enum: [ATIVO, INATIVO]
+          enum: [ACTIVE, INACTIVE]
         createdAt:
           type: string
           format: date-time
